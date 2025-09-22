@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Корзина - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">{{ page.headline|default:"Ваша корзина" }}</h2>
+<p class="text-center mb-4">{{ page.description|default:"Просмотрите выбранные туры." }}</p>
+{% if cart_items %}
+<div class="grid grid-cols-1 gap-6">
+    {% for item in cart_items %}
+    <div class="bg-white border border-gray-200 shadow-md rounded-lg p-6 flex items-center">
+        <div class="flex-shrink-0 mr-4">
+            {% if item.tour.image %}
+                <img src="{{ item.tour.image.url }}" alt="{{ item.tour.name }}" class="w-24 h-24 object-cover rounded">
+            {% else %}
+                <div class="w-24 h-24 bg-gray-200 rounded flex items-center justify-center">
+                    <span class="text-gray-500 text-xs">Нет изображения</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="flex-grow">
+            <h3 class="text-xl font-semibold">{{ item.tour.name }}</h3>
+            <p class="text-gray-600">Цена за тур: {{ item.tour.price }} ₽</p>
+            <form class="update-cart-form mt-2" method="post" action="{% url 'agency:update_cart_item' %}">
+                {% csrf_token %}
+                <input type="hidden" name="cart_item_id" value="{{ item.id }}">
+                <label for="quantity-{{ item.id }}" class="text-gray-700">Количество:</label>
+                <input type="number" id="quantity-{{ item.id }}" name="quantity" value="{{ item.quantity }}" min="1" class="w-16 border rounded p-1">
+                <button type="submit" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Обновить</button>
+            </form>
+            <p class="text-lg font-bold text-blue-600">Итого: <span class="total-cost">{{ item.total_cost }}</span> ₽</p>
+        </div>
+        <div class="flex-shrink-0">
+            <form class="delete-from-cart-form" method="post" action="{% url 'agency:delete_from_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="cart_item_id" value="{{ item.id }}">
+                <button type="submit" class="text-red-600 hover:text-red-800">
+                    <img src="{% static 'images/krestic.png' %}" alt="Удалить" class="w-6 h-6">
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center text-gray-600">Ваша корзина пуста.</p>
+{% endif %}
+<div class="text-center mt-6">
+    <a href="{% url 'agency:tours' %}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Вернуться к турам</a>
+</div>
+
+<script>
+function getCsrfToken() {
+    const token = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    return token || '';
+}
+
+// Обработчик для обновления количества
+document.querySelectorAll('.update-cart-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const cartItemId = form.querySelector('input[name="cart_item_id"]').value;
+        const quantity = form.querySelector('input[name="quantity"]').value;
+        const csrfToken = getCsrfToken();
+
+        console.log('Отправляем данные (обновление):', { cart_item_id: cartItemId, quantity: quantity, csrfmiddlewaretoken: csrfToken }); // Отладка
+
+        const formData = new FormData();
+        formData.append('cart_item_id', cartItemId);
+        formData.append('quantity', quantity);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch("{% url 'agency:update_cart_item' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Статус ответа (обновление):', response.status); // Отладка
+            if (!response.ok) {
+                throw new Error(`HTTP ошибка: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Ответ сервера (обновление):', data); // Отладка
+            if (data.status === 'success') {
+                alert(data.message);
+                // Обновляем итоговую стоимость в UI
+                form.closest('.bg-white').querySelector('.total-cost').textContent = data.total_cost;
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка (обновление):', error);
+            alert('Произошла ошибка при обновлении количества: ' + error.message);
+        });
+    });
+});
+
+// Обработчик для удаления
+document.querySelectorAll('.delete-from-cart-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const cartItemId = form.querySelector('input[name="cart_item_id"]').value;
+        const csrfToken = getCsrfToken();
+
+        console.log('Отправляем данные (удаление):', { cart_item_id: cartItemId, csrfmiddlewaretoken: csrfToken }); // Отладка
+
+        const formData = new FormData();
+        formData.append('cart_item_id', cartItemId);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch("{% url 'agency:delete_from_cart' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Статус ответа (удаление):', response.status); // Отладка
+            if (!response.ok) {
+                throw new Error(`HTTP ошибка: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Ответ сервера (удаление):', data); // Отладка
+            if (data.status === 'success') {
+                alert(data.message);
+                form.closest('.bg-white').remove(); // Удаляем элемент из DOM
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка (удаление):', error);
+            alert('Произошла ошибка при удалении из корзины: ' + error.message);
+        });
+    });
+});
+</script>
+{% endblock %}

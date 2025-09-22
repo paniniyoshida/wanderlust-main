@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Главная - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">{{ page.headline|default:"Добро пожаловать в Туры Wanderlust!" }}</h2>
+<p class="text-center mb-4">{{ page.description|default:"Исследуйте мир с нашими уникальными турами." }}</p>
+{% if page.banner_image %}
+    <img src="{% static 'images/'|add:page.banner_image %}" alt="Баннер главной" class="banner mx-auto mb-4">
+{% endif %}
+<div class="text-center">
+    <a href="{% url 'agency:tours' %}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">{{ page.cta_text|default:"Исследовать туры" }}</a>
+</div>
+{% endblock %}

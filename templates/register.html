@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Регистрация - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">Регистрация</h2>
+<form method="post" class="max-w-md mx-auto">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <ul class="list-disc list-inside">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    
+    <div class="mb-4">
+        <label for="{{ form.username.id_for_label }}" class="block text-gray-700">Имя пользователя:</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-4">
+        <label for="{{ form.email.id_for_label }}" class="block text-gray-700">Электронная почта:</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-4">
+        <label for="{{ form.password1.id_for_label }}" class="block text-gray-700">Пароль:</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.password1.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-4">
+        <label for="{{ form.password2.id_for_label }}" class="block text-gray-700">Подтверждение пароля:</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.password2.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Зарегистрироваться</button>
+    </div>
+</form>
+<div class="text-center mt-4">
+    <a href="{% url 'agency:login' %}" class="text-blue-600 hover:underline">Уже есть аккаунт? Войти</a>
+</div>
+{% endblock %}

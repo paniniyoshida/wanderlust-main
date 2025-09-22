@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Вход - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">Вход</h2>
+<form method="post" class="max-w-md mx-auto">
+    {% csrf_token %}
+    <div class="mb-4">
+        <label for="username" class="block text-gray-700">Имя пользователя:</label>
+        <input type="text" id="username" name="username" required class="w-full border rounded p-2">
+    </div>
+    <div class="mb-4">
+        <label for="password" class="block text-gray-700">Пароль:</label>
+        <input type="password" id="password" name="password" required class="w-full border rounded p-2">
+    </div>
+    <div class="mb-4">
+        <label for="remember_me" class="inline-flex items-center">
+            <input type="checkbox" id="remember_me" name="remember_me" class="mr-2">
+            <span class="text-gray-700">Запомнить меня</span>
+        </label>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Войти</button>
+    </div>
+</form>
+<div class="text-center mt-4">
+    <a href="{% url 'agency:register' %}" class="text-blue-600 hover:underline">Нет аккаунта? Зарегистрироваться</a>
+</div>
+{% endblock %}

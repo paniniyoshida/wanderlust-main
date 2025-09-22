@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Все туры - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">{{ page.headline|default:"Все туры" }}</h2>
+<p class="text-center mb-4">{{ page.description|default:"Ознакомьтесь с нашими турами." }}</p>
+{% if page.banner_image %}
+    <img src="{% static 'images/'|add:page.banner_image %}" alt="Баннер туров" class="banner mx-auto mb-4">
+{% endif %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for tour in tours %}
+    <div class="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden cursor-pointer" data-tour-id="{{ tour.id }}" data-tour-name="{{ tour.name }}" data-tour-price="{{ tour.price }}" onclick="openModal(this)">
+        {% if tour.image %}
+            <img src="{{ tour.image.url }}" alt="{{ tour.name }}" class="w-full h-48 object-cover">
+        {% else %}
+            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-500">Нет изображения</span>
+            </div>
+        {% endif %}
+        <div class="p-6 text-center">
+            <h3 class="text-xl font-semibold mb-2">{{ tour.name }}</h3>
+            <p class="text-gray-600 mb-4">{{ tour.description|truncatewords:20 }}</p>
+            <p class="text-lg font-bold text-blue-600">{{ tour.price }} ₽</p>
+            <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Добавить в корзину</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="text-center mt-6">
+    <a href="{% url 'agency:tours' %}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Вернуться к турам</a>
+</div>
+
+<!-- Modal -->
+<div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 id="modalTourName" class="text-xl font-semibold mb-4"></h3>
+        <p id="modalTourPrice" class="text-lg mb-4"></p>
+        <form id="addToCartForm">
+            <input type="hidden" id="tourId" name="tour_id">
+            <div class="mb-4">
+                <label for="quantity" class="block text-gray-700">Количество:</label>
+                <input type="number" id="quantity" name="quantity" min="1" value="1" class="w-full border rounded p-2">
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button type="button" onclick="closeModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Отмена</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Добавить в корзину</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(element) {
+    const modal = document.getElementById('cartModal');
+    const tourId = element.getAttribute('data-tour-id');
+    const tourName = element.getAttribute('data-tour-name');
+    const tourPrice = element.getAttribute('data-tour-price');
+
+    document.getElementById('modalTourName').textContent = tourName;
+    document.getElementById('modalTourPrice').textContent = `${tourPrice} ₽`;
+    document.getElementById('tourId').value = tourId;
+    modal.classList.remove('hidden');
+}
+
+function closeModal() {
+    const modal = document.getElementById('cartModal');
+    modal.classList.add('hidden');
+}
+
+document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const tourId = document.getElementById('tourId').value;
+    const quantity = document.getElementById('quantity').value;
+
+    console.log('Отправляем данные:', { tour_id: tourId, quantity: quantity }); // Отладка
+
+    const formData = new FormData();
+    formData.append('tour_id', tourId);
+    formData.append('quantity', quantity);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch("{% url 'agency:add_to_cart' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    })
+    .then(response => {
+        console.log('Статус ответа:', response.status); // Отладка
+        if (!response.ok) {
+            throw new Error(`HTTP ошибка: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Ответ сервера:', data); // Отладка
+        if (data.status === 'success') {
+            alert(data.message);
+            closeModal();
+        } else {
+            alert('Ошибка: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при добавлении в корзину: ' + error.message);
+    });
+});
+</script>
+{% endblock %}

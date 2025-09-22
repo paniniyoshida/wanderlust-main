@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Категории туров - Туры Wanderlust{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-4 text-center">{{ page.headline|default:"Категории туров" }}</h2>
+<p class="text-center mb-4">{{ page.description|default:"Выберите категорию для вашего путешествия." }}</p>
+{% if page.banner_image %}
+    <img src="{% static 'images/'|add:page.banner_image %}" alt="Баннер категорий" class="banner mx-auto mb-4">
+{% endif %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for category in categories %}
+    <a href="{% url 'agency:all_tours' %}?category_id={{ category.id }}" class="block bg-white border border-gray-200 shadow-md rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
+        <h3 class="text-xl font-semibold mb-2">{{ category.name }}</h3>
+        <p class="text-gray-600 mb-4">{{ category.description }}</p>
+    </a>
+    {% endfor %}
+</div>
+<div class="text-center mt-6">
+    <a href="{% url 'agency:tours' %}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Вернуться к турам</a>
+</div>
+{% endblock %}

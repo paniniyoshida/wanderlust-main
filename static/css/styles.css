@@ -1,14 +1,11 @@
-/* Navigation dropdown styles */
 .group:hover .group-hover\:block {
     display: block;
 }
 
-/* Button styles */
 button, a.bg-blue-600 {
     transition: background-color 0.2s;
 }
 
-/* Card styles */
 .bg-white.border-gray-200 {
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -17,7 +14,6 @@ button, a.bg-blue-600 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Modal styles */
 #cartModal {
     transition: opacity 0.3s ease-in-out;
 }
@@ -29,7 +25,6 @@ button, a.bg-blue-600 {
     pointer-events: none;
 }
 
-/* Delete icon styles */
 .delete-cart-item img {
     width: 20px;
     height: 20px;
@@ -39,14 +34,12 @@ button, a.bg-blue-600 {
     opacity: 0.7;
 }
 
-/* Ensure images are 192x192px */
 img.banner {
     width: 192px;
     height: 192px;
     object-fit: cover;
 }
 
-/* Ensure dropdown is positioned correctly */
 .relative {
     position: relative;
 }
@@ -55,7 +48,6 @@ img.banner {
     min-width: 160px;
 }
 
-/* Form field styles */
 input[type="text"], input[type="email"], input[type="password"] {
     width: 100%;
     border: 1px solid #d1d5db;

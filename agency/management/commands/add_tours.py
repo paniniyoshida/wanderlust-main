@@ -7,7 +7,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Добавляем туры...')
         
-        # Создаем категории, если их нет
         beach, created = Category.objects.get_or_create(
             name="Пляжный отдых",
             defaults={'description': 'Расслабьтесь на лучших пляжах мира.'}
@@ -36,9 +35,7 @@ class Command(BaseCommand):
         if created:
             self.stdout.write(f'Создана категория: {nature.name}')
         
-        # Добавляем туры
         tours_data = [
-            # Пляжный отдых
             {
                 'name': 'Мальдивы',
                 'description': 'Райские острова с белым песком и кристально чистой водой. Идеально для романтического отдыха.',
@@ -67,8 +64,6 @@ class Command(BaseCommand):
                 'category': beach,
                 'image': 'dominican.jpg'
             },
-            
-            # Приключения
             {
                 'name': 'Сафари в Кении',
                 'description': 'Увидеть большую пятерку в дикой природе. Незабываемые впечатления от африканского сафари.',
@@ -97,8 +92,6 @@ class Command(BaseCommand):
                 'category': adventure,
                 'image': 'maldives_diving.jpg'
             },
-            
-            # Культурный туризм
             {
                 'name': 'Япония - Страна восходящего солнца',
                 'description': 'Погрузитесь в уникальную культуру Японии: от древних храмов до современных мегаполисов.',
@@ -127,8 +120,6 @@ class Command(BaseCommand):
                 'category': cultural,
                 'image': 'egypt.jpg'
             },
-            
-            # Экотуризм
             {
                 'name': 'Амазонка, Бразилия',
                 'description': 'Исследуйте самое биоразнообразное место на планете. Встретьте диких животных в их естественной среде.',
@@ -159,7 +150,6 @@ class Command(BaseCommand):
             }
         ]
         
-        # Добавляем туры
         for tour_data in tours_data:
             tour, created = Tour.objects.get_or_create(
                 name=tour_data['name'],
@@ -174,7 +164,6 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'Тур уже существует: {tour.name}')
         
-        # Добавляем специальные предложения
         offers_data = [
             {
                 'name': 'Скидка на Мальдивы',

@@ -72,7 +72,7 @@ document.getElementById('addToCartForm').addEventListener('submit', function(e) 
     const tourId = document.getElementById('tourId').value;
     const quantity = document.getElementById('quantity').value;
 
-    console.log('Отправляем данные:', { tour_id: tourId, quantity: quantity }); // Отладка
+    console.log('Отправляем данные:', { tour_id: tourId, quantity: quantity });
 
     const formData = new FormData();
     formData.append('tour_id', tourId);
@@ -87,14 +87,14 @@ document.getElementById('addToCartForm').addEventListener('submit', function(e) 
         body: formData
     })
     .then(response => {
-        console.log('Статус ответа:', response.status); // Отладка
+        console.log('Статус ответа:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP ошибка: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log('Ответ сервера:', data); // Отладка
+        console.log('Ответ сервера:', data);
         if (data.status === 'success') {
             alert(data.message);
             closeModal();

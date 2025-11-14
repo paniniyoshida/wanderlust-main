@@ -74,7 +74,7 @@ class TourAdmin(admin.ModelAdmin):
     image_preview.short_description = "Превью изображения"
     
     def created_at(self, obj):
-        return obj.id  # Используем ID как пример, можно добавить поле created_at в модель
+        return obj.id
     created_at.short_description = "ID"
 
 @admin.register(CartItem)

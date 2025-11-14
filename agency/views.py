@@ -10,7 +10,6 @@ from django import forms
 from .models import HomePage, AboutPage, ContactPage, FindUsPage, ToursPage, CartPage, Category, Tour, CartItem, Offer, UserProfile
 from django.contrib.auth.models import User
 
-# Кастомная форма регистрации
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, label='Электронная почта')
     
@@ -25,13 +24,11 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
-# Миксин для требования авторизации
 class LoginRequiredMixin:
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-# Статические страницы
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
 
@@ -72,7 +69,6 @@ class ToursView(LoginRequiredMixin, TemplateView):
         context['page'] = ToursPage.objects.first()
         return context
 
-# Списки
 class CategoriesView(LoginRequiredMixin, ListView):
     model = Category
     template_name = 'categories.html'
@@ -132,7 +128,6 @@ class ProfileView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return CartItem.objects.filter(user=self.request.user)
 
-# Авторизация
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'register.html'
@@ -140,7 +135,6 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        # Создаем профиль пользователя с email
         UserProfile.objects.create(user=user, email=user.email)
         login(self.request, user)
         return super().form_valid(form)
@@ -155,12 +149,10 @@ class LoginView(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
-# Выход (FBV, так как дженерик избыточен)
 def logout_view(request):
     logout(request)
     return redirect('agency:login')
 
-# Корзина (AJAX)
 class AddToCartView(LoginRequiredMixin, CreateView):
     model = CartItem
     http_method_names = ['post']
@@ -169,7 +161,7 @@ class AddToCartView(LoginRequiredMixin, CreateView):
         try:
             tour_id = request.POST.get('tour_id')
             quantity = request.POST.get('quantity', '1')
-            post_data = request.POST.dict()  # Для отладки
+            post_data = request.POST.dict()
 
             if not tour_id:
                 return JsonResponse({
@@ -222,7 +214,7 @@ class UpdateCartItemView(LoginRequiredMixin, CreateView):
         try:
             cart_item_id = request.POST.get('cart_item_id')
             quantity = request.POST.get('quantity')
-            post_data = request.POST.dict()  # Для отладки
+            post_data = request.POST.dict()
 
             if not cart_item_id:
                 return JsonResponse({
@@ -307,5 +299,4 @@ class DeleteFromCartView(LoginRequiredMixin, DeleteView):
         return get_object_or_404(CartItem, id=cart_item_id, user=self.request.user)
 
     def get_success_url(self):
-        # Не используется, так как возвращаем JSON
         pass
